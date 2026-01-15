@@ -1,9 +1,11 @@
 <?php
 include("conexion.php");
 
-$id = $_GET['id'];
+$id = $_GET['id'] ?? null;
 
-$conn->query("DELETE FROM pedidos WHERE id = $id");
+if ($id !== null) {
+    eliminarPedido($id);
+}
 
 header("Location: listar.php");
 ?>

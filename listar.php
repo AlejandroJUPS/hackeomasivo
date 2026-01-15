@@ -1,6 +1,10 @@
 <?php
 include("conexion.php");
-$result = $conn->query("SELECT * FROM pedidos ORDER BY fecha DESC");
+$pedidos = obtenerPedidos();
+// Ordenar por fecha descendente
+usort($pedidos, function($a, $b) {
+    return strtotime($b['fecha']) - strtotime($a['fecha']);
+});
 ?>
 
 <!DOCTYPE html>
@@ -23,10 +27,10 @@ $result = $conn->query("SELECT * FROM pedidos ORDER BY fecha DESC");
         <th>Acción</th>
     </tr>
 
-    <?php while ($row = $result->fetch_assoc()) { ?>
+    <?php foreach ($pedidos as $row) { ?>
     <tr>
-        <td><?= $row['codigo'] ?></td>
-        <td><?= $row['cliente'] ?></td>
+        <td><?= htmlspecialchars($row['codigo']) ?></td>
+        <td><?= htmlspecialchars($row['cliente']) ?></td>
         <td><?= $row['cantidad_sencillo'] ?></td>
         <td><?= $row['cantidad_especial'] ?></td>
         <td><?= $row['fecha'] ?></td>

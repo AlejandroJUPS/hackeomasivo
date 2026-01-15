@@ -1,17 +1,15 @@
 <?php
 include("conexion.php");
 
-$codigo    = $_POST['codigo'];
-$cliente   = $_POST['cliente'];
-$sencillo  = $_POST['sencillo'];
-$especial  = $_POST['especial'];
+$codigo    = $_POST['codigo'] ?? '';
+$cliente   = $_POST['cliente'] ?? '';
+$sencillo  = $_POST['sencillo'] ?? 0;
+$especial  = $_POST['especial'] ?? 0;
 
-$sql = "INSERT INTO pedidos (codigo, cliente, cantidad_sencillo, cantidad_especial)
-        VALUES ('$codigo', '$cliente', $sencillo, $especial)";
-
-if ($conn->query($sql) === TRUE) {
+if (!empty($codigo) && !empty($cliente)) {
+    agregarPedido($codigo, $cliente, $sencillo, $especial);
     header("Location: listar.php");
 } else {
-    echo "Error: " . $conn->error;
+    header("Location: index.php");
 }
 ?>
