@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>System Beware Retro</title>
+
+    <!-- FAVICON -->
+    <link rel="icon" type="image/jpeg" href="Cannibal Sufering.jpg">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#e50914">
+
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            background: radial-gradient(circle at top, #1a0000, #000000 70%);
+            color: #e5e5e5;
+            font-family: monospace;
+            overflow: hidden;
+        }
+
+        body, #box, #top {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        /* LOGO */
+        #logo {
+            width: 420px;
+            max-width: 95%;
+            margin-bottom: 12px;
+            border-radius: 6px;
+            image-rendering: pixelated;
+            filter:
+                drop-shadow(0 0 10px rgba(229,9,20,0.6))
+                contrast(1.1)
+                saturate(1.2);
+        }
+
+        #top p {
+            color: #aaa;
+            margin-top: 0;
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        #box {
+            height: 20em;
+            width: 32em;
+            max-width: 85%;
+            max-height: 80%;
+            background: linear-gradient(145deg, #120000, #1c0000);
+            border-radius: 0.6em;
+            border: 2px solid #400;
+            position: relative;
+            transition: all 0.25s ease;
+            overflow: hidden;
+            font-weight: bold;
+            font-size: 20px;
+            margin: 10px;
+            text-align: center;
+            padding: 15px;
+            box-shadow: 0 0 30px rgba(229,9,20,0.15);
+        }
+
+        #box:hover, #box[drag] {
+            border-color: #e50914;
+            color: #fff;
+            box-shadow: 0 0 40px rgba(229,9,20,0.35);
+        }
+
+        #input {
+            cursor: pointer;
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+        }
+
+        select, button {
+            padding: 0.7em;
+            margin: 0.5em;
+            width: 16em;
+            max-width: 100%;
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 16px;
+            background-color: #1a0000;
+            color: #e5e5e5;
+            border-radius: 0.4em;
+            border: 1px solid #500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        select:hover, button:hover {
+            background-color: #e50914;
+            color: #fff;
+            border-color: #e50914;
+        }
+
+        #display {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- LOGO -->
+    <div id="top">
+        <img src="Cannibal Sufering.jpg" alt="System Beware Retro" id="logo">
+        <p>Arrastra tu ROM o haz clic para comenzar</p>
+    </div>
+
+    <!-- CAJA DE CARGA -->
+    <div id="box">
+        <input type="file" id="input">
+        Arrastra aquí tu archivo ROM<br>o haz clic para seleccionarlo
+    </div>
+
+    <!-- EMULADOR -->
+    <script>
+        let enableDebug = false;
+        let enableThreads = false;
+        const urlParams = new URLSearchParams(window.location.search);
+
+        if (urlParams.get('debug') === "1" || urlParams.get('debug') === "true") {
+            enableDebug = true;
+        }
+
+        if (urlParams.get('threads') === "1" || urlParams.get('threads') === "true") {
+            if (window.SharedArrayBuffer) {
+                enableThreads = true;
+            }
+        }
+
+        if (urlParams.get('rom')) {
+            run(false, urlParams.get('rom'));
+        }
+
+        async function run(upload, file) {
+            const url = upload ? input.files[0] : `roms/${file}`;
+            const parts = upload ? input.files[0].name.split(".") : file.split(".");
+
+            const core = await (async (ext) => {
+                if (["fds","nes","unif","unf"].includes(ext)) return "nes";
+                if (["smc","fig","sfc","gd3","gd7","dx2","bsx","swc"].includes(ext)) return "snes";
+                if (["z64","n64"].includes(ext)) return "n64";
+                if (["pce"].includes(ext)) return "pce";
+                if (["ngp","ngc"].includes(ext)) return "ngp";
+                if (["ws","wsc"].includes(ext)) return "ws";
+                if (["col","cv"].includes(ext)) return "coleco";
+                if (["d64"].includes(ext)) return "vice_x64sc";
+                if (["nds","gba","gb"].includes(ext)) return ext;
+
+                return await new Promise(resolve => {
+                    const button = document.createElement("button");
+                    const select = document.createElement("select");
+
+                    const cores = {
+                        "Super Nintendo": "snes",
+                        "Nintendo NES": "nes",
+                        "Nintendo 64": "n64",
+                        "Game Boy": "gb",
+                        "Game Boy Advance": "gba",
+                        "Nintendo DS": "nds",
+                        "PlayStation": "psx"
+                    };
+
+                    for (const name in cores) {
+                        const option = document.createElement("option");
+                        option.value = cores[name];
+                        option.textContent = name;
+                        select.appendChild(option);
+                    }
+
+                    button.textContent = "Cargar juego";
+                    button.onclick = () => resolve(select.value);
+
+                    box.innerHTML = "";
+                    box.appendChild(select);
+                    box.appendChild(button);
+                });
+            })(parts.pop());
+
+            const display = document.createElement("div");
+            const game = document.createElement("div");
+            const script = document.createElement("script");
+
+            display.id = "display";
+            game.id = "game";
+
+            document.getElementById("top").remove();
+            box.remove();
+
+            display.appendChild(game);
+            document.body.appendChild(display);
+
+            window.EJS_player = "#game";
+            window.EJS_gameName = parts.join(".");
+            window.EJS_gameUrl = url;
+            window.EJS_core = core;
+            window.EJS_pathtodata = "data/";
+            window.EJS_startOnLoaded = true;
+            window.EJS_DEBUG_XX = enableDebug;
+            window.EJS_threads = enableThreads;
+
+            script.src = "data/loader.js";
+            document.body.appendChild(script);
+        }
+
+        input.onchange = () => run(true);
+        box.ondragover = () => box.setAttribute("drag", true);
+        box.ondragleave = () => box.removeAttribute("drag");
+    </script>
+
+</body>
+</html>
