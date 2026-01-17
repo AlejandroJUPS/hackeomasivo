@@ -25,9 +25,11 @@ if(isset($_POST['action'])){
         $st=$conn->prepare("SELECT id,password FROM users WHERE username=?");
         $st->bind_param("s",$u);
         $st->execute();
-        $st->bind_result($id,$hash);
+        $result=$st->get_result();
+        $row=$result->fetch_assoc();
 
-        if($st->fetch() && password_verify($p,$hash)){
+        if($row && password_verify($p,$row['password'])){
+            $id=$row['id'];
             $_SESSION['user_id']=$id;
             $_SESSION['username']=$u;
             echo "OK";
