@@ -99,14 +99,14 @@ if(isset($_SESSION['user_id'])){
    SISTEMAS
 ========================= */
 $systems=[
- "nes"=>["label"=>"NES","short"=>"NES","logo"=>"logos/nes.png"],
- "snes"=>["label"=>"SNES","short"=>"SNES","logo"=>"logos/snes.png"],
- "n64"=>["label"=>"Nintendo 64","short"=>"N64","logo"=>"logos/n64.png"],
- "gba"=>["label"=>"Game Boy Advance","short"=>"GBA","logo"=>"logos/gba.png"],
- "gb"=>["label"=>"Game Boy","short"=>"GB","logo"=>"logos/gb.png"],
- "gbc"=>["label"=>"Game Boy Color","short"=>"GBC","logo"=>"logos/gbc.png"],
- "psx"=>["label"=>"PlayStation","short"=>"PS1","logo"=>"logos/psx.png"],
- "megadrive"=>["label"=>"Mega Drive","short"=>"MD","logo"=>"logos/megadrive.png"]
+ "nes"=>["label"=>"NES","short"=>"NES","logo"=>"logo/nes.png"],
+ "snes"=>["label"=>"SNES","short"=>"SNES","logo"=>"logo/snes.png"],
+ "n64"=>["label"=>"Nintendo 64","short"=>"N64","logo"=>"logo/n64.png"],
+ "gba"=>["label"=>"Game Boy Advance","short"=>"GBA","logo"=>"logo/gba.png"],
+ "gb"=>["label"=>"Game Boy","short"=>"GB","logo"=>"logo/gb.png"],
+ "gbc"=>["label"=>"Game Boy Color","short"=>"GBC","logo"=>"logo/gbc.png"],
+ "psx"=>["label"=>"PlayStation","short"=>"PS1","logo"=>"logo/psx.png"],
+ "megadrive"=>["label"=>"Mega Drive","short"=>"MD","logo"=>"logo/megadrive.png"]
 ];
 
 $currentSystem=$_GET['system']??null;
