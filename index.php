@@ -133,15 +133,16 @@ span.short{display:none}
 
 <h2><?=$systems[$currentSystem]['label']?></h2>
 <div class="grid">
-<?php foreach($roms as $r):
-$id=$currentSystem."::".$r; ?>
-<a class="game" href="play.php?system=<?=$currentSystem?>&rom=<?=urlencode($r)?>">
-<span class="star <?=in_array($id,$userFavorites)?'active':''?>"
-onclick="toggleFav(event,'<?=$currentSystem?>','<?=$r?>')">★</span>
-<img src="<?=$systems[$currentSystem]['logo']?>">
+<?php foreach($userFavorites as $f):
+[$s,$r]=explode("::",$f); ?>
+<a class="game" href="play.php?system=<?=$s?>&rom=<?=urlencode($r)?>">
+<span class="star active"
+      onclick="toggleFav(event,'<?=$s?>','<?=$r?>',this)">★</span>
+<img src="<?=$systems[$s]['logo']?>">
 <div><?=cleanName($r)?></div>
 </a>
 <?php endforeach ?>
+
 </div>
 
 <?php else: ?>
@@ -212,16 +213,34 @@ function logout(){
  }).then(()=>location.reload());
 }
 
-function toggleFav(e,s,r){
- e.preventDefault(); e.stopPropagation();
- if(!logged){ showLogin(); return; }
+function toggleFav(e, s, r, el){
+  e.preventDefault();
+  e.stopPropagation();
 
- fetch("favorites.php",{
-  method:"POST",
-  headers:{'Content-Type':'application/x-www-form-urlencoded'},
-  body:`system=${s}&rom=${encodeURIComponent(r)}`
- }).then(()=>location.reload());
+  if(!logged){
+    showLogin();
+    return;
+  }
+
+  fetch("favorites.php",{
+    method:"POST",
+    headers:{'Content-Type':'application/x-www-form-urlencoded'},
+    body:`system=${s}&rom=${encodeURIComponent(r)}`
+  })
+  .then(r=>r.text())
+  .then(t=>{
+    if(t==="REMOVED"){
+      // si estamos en favoritos, quitar bloque
+      if(el){
+        const game = el.closest(".game");
+        if(game) game.remove();
+      }
+    }else if(t==="ADDED"){
+      el.classList.add("active");
+    }
+  });
 }
+
 </script>
 
 </body>
