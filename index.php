@@ -20,7 +20,7 @@ $currentSystem = $_GET['system'] ?? null;
 $showFavorites = isset($_GET['favorites']);
 
 /* =========================
-   FAVORITOS (FETCH)
+   FAVORITOS DEL USUARIO
 ========================= */
 $userFavorites = [];
 
@@ -68,20 +68,33 @@ body{margin:0;background:#000;color:#fff;font-family:Arial;display:flex}
 .sidebar.min span.text{display:none}
 span.short{display:none}
 .sidebar.min span.short{display:inline}
+
 .main{flex:1;padding:20px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:15px}
-.game{background:#111;padding:10px;border-radius:6px;text-align:center;position:relative;color:#fff;text-decoration:none}
-.game img{width:100%;height:140px;object-fit:contain;background:#000}
-.star{position:absolute;top:8px;right:8px;font-size:18px;color:#777;cursor:pointer}
-.star.active{color:#ffd700}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}
-.modal-box{background:#111;padding:20px;border-radius:8px;width:280px}
-.modal input{width:100%;padding:8px;margin:6px 0}
+
+.game{
+ background:#111;padding:10px;border-radius:6px;
+ text-align:center;position:relative;
+ color:#fff;text-decoration:none
+}
+.game img{
+ width:100%;height:140px;
+ object-fit:contain;background:#000
+}
+
+.star{
+ position:absolute;top:8px;right:8px;
+ font-size:18px;color:#777;cursor:pointer;
+ transition:.15s
+}
+.star.active{color:#ffd700;transform:scale(1.2)}
+.star:hover{transform:scale(1.3)}
 </style>
 </head>
 
 <body>
 
+<!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
 <div onclick="toggleSidebar()" style="cursor:pointer;font-size:22px">☰</div>
 
@@ -108,6 +121,7 @@ span.short{display:none}
 <?php endif ?>
 </div>
 
+<!-- MAIN -->
 <div class="main">
 
 <?php if($showFavorites): ?>
@@ -115,34 +129,37 @@ span.short{display:none}
 <h2>⭐ Favoritos</h2>
 
 <?php if(!isset($_SESSION['user_id'])): ?>
-<p>Debes iniciar sesión</p>
+<p>Debes iniciar sesión.</p>
 <?php else: ?>
-<div class="grid">
-<?php foreach($userFavorites as $f):
-[$s,$r]=explode("::",$f); ?>
-<a class="game" href="play.php?system=<?=$s?>&rom=<?=urlencode($r)?>">
-<span class="star active">★</span>
-<img src="<?=$systems[$s]['logo']?>">
-<div><?=cleanName($r)?></div>
-</a>
-<?php endforeach ?>
-</div>
-<?php endif ?>
 
-<?php elseif($currentSystem): ?>
-
-<h2><?=$systems[$currentSystem]['label']?></h2>
 <div class="grid">
 <?php foreach($userFavorites as $f):
 [$s,$r]=explode("::",$f); ?>
 <a class="game" href="play.php?system=<?=$s?>&rom=<?=urlencode($r)?>">
 <span class="star active"
-      onclick="toggleFav(event,'<?=$s?>','<?=$r?>',this)">★</span>
+ onclick="toggleFav(event,'<?=$s?>','<?=$r?>',this)">★</span>
 <img src="<?=$systems[$s]['logo']?>">
 <div><?=cleanName($r)?></div>
 </a>
 <?php endforeach ?>
+</div>
 
+<?php endif ?>
+
+<?php elseif($currentSystem): ?>
+
+<h2><?=$systems[$currentSystem]['label']?></h2>
+
+<div class="grid">
+<?php foreach($roms as $r):
+$id=$currentSystem."::".$r; ?>
+<a class="game" href="play.php?system=<?=$currentSystem?>&rom=<?=urlencode($r)?>">
+<span class="star <?=in_array($id,$userFavorites)?'active':''?>"
+ onclick="toggleFav(event,'<?=$currentSystem?>','<?=$r?>',this)">★</span>
+<img src="<?=$systems[$currentSystem]['logo']?>">
+<div><?=cleanName($r)?></div>
+</a>
+<?php endforeach ?>
 </div>
 
 <?php else: ?>
@@ -162,11 +179,14 @@ span.short{display:none}
 </div>
 
 <!-- LOGIN MODAL -->
-<div class="modal" id="loginModal">
-<div class="modal-box">
+<div class="modal" id="loginModal"
+ style="position:fixed;inset:0;background:rgba(0,0,0,.7);
+ display:none;align-items:center;justify-content:center">
+<div style="background:#111;padding:20px;border-radius:8px;width:280px">
 <h3>Login / Registro</h3>
-<input id="lu" placeholder="Usuario">
-<input id="lp" type="password" placeholder="Contraseña">
+<input id="lu" placeholder="Usuario" style="width:100%;padding:8px">
+<input id="lp" type="password" placeholder="Contraseña"
+ style="width:100%;padding:8px;margin-top:6px">
 <button onclick="login()">Login</button>
 <button onclick="register()">Registrar</button>
 </div>
@@ -213,34 +233,25 @@ function logout(){
  }).then(()=>location.reload());
 }
 
-function toggleFav(e, s, r, el){
-  e.preventDefault();
-  e.stopPropagation();
+function toggleFav(e,s,r,el){
+ e.preventDefault();
+ e.stopPropagation();
 
-  if(!logged){
-    showLogin();
-    return;
-  }
+ if(!logged){ showLogin(); return; }
 
-  fetch("favorites.php",{
-    method:"POST",
-    headers:{'Content-Type':'application/x-www-form-urlencoded'},
-    body:`system=${s}&rom=${encodeURIComponent(r)}`
-  })
-  .then(r=>r.text())
-  .then(t=>{
-    if(t==="REMOVED"){
-      // si estamos en favoritos, quitar bloque
-      if(el){
-        const game = el.closest(".game");
-        if(game) game.remove();
-      }
-    }else if(t==="ADDED"){
-      el.classList.add("active");
-    }
-  });
+ fetch("favorites.php",{
+  method:"POST",
+  headers:{'Content-Type':'application/x-www-form-urlencoded'},
+  body:`system=${s}&rom=${encodeURIComponent(r)}`
+ })
+ .then(r=>r.text())
+ .then(t=>{
+   if(t==="REMOVED"){
+     const game = el.closest(".game");
+     if(game) game.remove();
+   }
+ });
 }
-
 </script>
 
 </body>
