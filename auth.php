@@ -1,57 +1,63 @@
 <?php
-// auth.php - Login & Register (AJAX only)
 session_start();
-require_once __DIR__ . "/db.php";
+require_once __DIR__."/db.php";
 
-if (!isset($_POST['action'])) {
-    http_response_code(400);
-    exit("BAD_REQUEST");
+/* =========================
+   LOGOUT
+========================= */
+if (isset($_POST['action']) && $_POST['action'] === 'logout') {
+    session_unset();
+    session_destroy();
+    echo "OK";
+    exit;
 }
 
-$action = $_POST['action'];
+/* =========================
+   LOGIN
+========================= */
+if (isset($_POST['action']) && $_POST['action'] === 'login') {
 
-if ($action === "login") {
-    $u = trim($_POST['username'] ?? "");
-    $p = $_POST['password'] ?? "";
+    $username = trim($_POST['username'] ?? '');
+    $password = $_POST['password'] ?? '';
 
-    if ($u === "" || $p === "") {
-        exit("ERROR");
-    }
-
-    $st = $conn->prepare("SELECT id, password FROM users WHERE username=?");
-    $st->bind_param("s", $u);
+    $st = $conn->prepare("SELECT id,password FROM users WHERE username=?");
+    $st->bind_param("s", $username);
     $st->execute();
     $res = $st->get_result();
     $row = $res->fetch_assoc();
 
-    if ($row && password_verify($p, $row['password'])) {
+    if ($row && password_verify($password, $row['password'])) {
         $_SESSION['user_id'] = $row['id'];
-        $_SESSION['username'] = $u;
-        exit("OK");
+        $_SESSION['username'] = $username;
+        echo "OK";
+    } else {
+        echo "ERROR";
     }
-    exit("ERROR");
+    exit;
 }
 
-if ($action === "register") {
-    $u = trim($_POST['username'] ?? "");
-    $p = $_POST['password'] ?? "";
+/* =========================
+   REGISTER
+========================= */
+if (isset($_POST['action']) && $_POST['action'] === 'register') {
 
-    if ($u === "" || strlen($p) < 8) {
-        exit("SHORT");
+    $username = trim($_POST['username'] ?? '');
+    $password = $_POST['password'] ?? '';
+
+    if (strlen($password) < 8) {
+        echo "SHORT";
+        exit;
     }
 
-    $hash = password_hash($p, PASSWORD_DEFAULT);
+    $hash = password_hash($password, PASSWORD_DEFAULT);
+
     $st = $conn->prepare("INSERT INTO users(username,password) VALUES(?,?)");
-    $st->bind_param("ss", $u, $hash);
+    $st->bind_param("ss", $username, $hash);
 
     if ($st->execute()) {
-        exit("OK");
+        echo "OK";
     } else {
-        // Duplicate username or other SQL error
-        exit("EXISTS");
+        echo "EXISTS";
     }
+    exit;
 }
-
-http_response_code(400);
-exit("BAD_ACTION");
-?>
