@@ -7,7 +7,7 @@ session_start();
 $DB_HOST = "sql103.infinityfree.com";
 $DB_USER = "if0_40909083";
 $DB_PASS = "l26odsVdk4PSgga";
-$DB_NAME = "if0_40909083_emutable";
+$DB_NAME = "";
 
 $conn = new mysqli($DB_HOST,$DB_USER,$DB_PASS,$DB_NAME);
 if($conn->connect_error){ die("DB ERROR"); }
