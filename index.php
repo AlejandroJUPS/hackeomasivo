@@ -156,8 +156,8 @@ span.short{display:none}
 <h3>Elige un avatar</h3>
 <div class="avatar-grid">
 <?php for($i=1;$i<=10;$i++): ?>
-<div class="avatar-option" onclick="selectAvatar('avatar<?=$i?>.png',this)">
-<img src="assets/avatars/avatar<?=$i?>.png">
+<div class="avatar-option" onclick="selectAvatar('avatar<?=$i?>.jpg',this)">
+<img src="assets/avatars/avatar<?=$i?>.jpg">
 </div>
 <?php endfor ?>
 </div>
