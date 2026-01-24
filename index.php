@@ -6,9 +6,9 @@ require_once "db.php";
    DATOS DE SESIÓN
 ========================= */
 $logged = isset($_SESSION['user_id']);
-$avatar = $_SESSION['avatar'] ?? 'avatar_default';
+$avatar = $_SESSION['avatar'] ?? 'avatar1';
 $username = $_SESSION['username'] ?? '';
-$avatarPath = "avatars/$avatar.png";
+$avatarPath = "assets/avatars/$avatar.jpg";
 
 /* =========================
    SISTEMAS
@@ -174,8 +174,8 @@ span.short{display:none}
 
 <h3>Cambiar avatar</h3>
 <div class="avatar-grid">
-<?php for($i=1;$i<=20;$i++): ?>
-<img src="avatars/avatar<?=$i?>.jpg"
+<?php for($i=1;$i<=12;$i++): ?>
+<img src="assets/avatars/avatar<?=$i?>.jpg"
  class="avatar-option"
  onclick="updateAvatar('avatar<?=$i?>')">
 <?php endfor ?>
