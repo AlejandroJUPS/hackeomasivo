@@ -18,15 +18,24 @@ class GamepadNavigation {
         try {
             const handler = new GamepadHandler();
             
+            // DEBUG: Mostrar todos los botones presionados
+            handler.on('buttondown', (e) => {
+                console.log('Botón presionado:', e.label, '(índice:', e.index, ')');
+            });
+            
             // Detectar botones del D-Pad
             handler.on('buttondown', (e) => {
                 if (e.label === 'DPAD_UP') {
+                    console.log('→ Ejecutando navigateUp()');
                     this.navigateUp();
                 } else if (e.label === 'DPAD_DOWN') {
+                    console.log('→ Ejecutando navigateDown()');
                     this.navigateDown();
                 } else if (e.label === 'DPAD_LEFT') {
+                    console.log('→ Ejecutando navigateLeft()');
                     this.navigateLeft();
                 } else if (e.label === 'DPAD_RIGHT') {
+                    console.log('→ Ejecutando navigateRight()');
                     this.navigateRight();
                 } else if (e.label === 'BUTTON_1' || e.label === 'START') {
                     // Botón A o Start para confirmar
