@@ -86,26 +86,46 @@ class GamepadNavigation {
     }
     
     navigateUp() {
+        // Para grillas: ir arriba
         this.updateFocusableElements();
         if (!this.selectedElement) {
             this.focusFirst();
             return;
         }
-        const index = this.focusableElements.indexOf(this.selectedElement);
-        if (index > 0) {
-            this.focusElement(this.focusableElements[index - 1]);
+        
+        const rect = this.selectedElement.getBoundingClientRect();
+        const candidates = this.focusableElements.filter(el => {
+            const elRect = el.getBoundingClientRect();
+            return Math.abs(elRect.left - rect.left) < 50 && elRect.top < rect.top;
+        });
+        
+        if (candidates.length > 0) {
+            const closest = candidates.reduce((prev, curr) => {
+                return (curr.getBoundingClientRect().top > prev.getBoundingClientRect().top) ? curr : prev;
+            });
+            this.focusElement(closest);
         }
     }
     
     navigateDown() {
+        // Para grillas: ir abajo
         this.updateFocusableElements();
         if (!this.selectedElement) {
             this.focusFirst();
             return;
         }
-        const index = this.focusableElements.indexOf(this.selectedElement);
-        if (index < this.focusableElements.length - 1) {
-            this.focusElement(this.focusableElements[index + 1]);
+        
+        const rect = this.selectedElement.getBoundingClientRect();
+        const candidates = this.focusableElements.filter(el => {
+            const elRect = el.getBoundingClientRect();
+            return Math.abs(elRect.left - rect.left) < 50 && elRect.top > rect.top;
+        });
+        
+        if (candidates.length > 0) {
+            const closest = candidates.reduce((prev, curr) => {
+                return (curr.getBoundingClientRect().top < prev.getBoundingClientRect().top) ? curr : prev;
+            });
+            this.focusElement(closest);
         }
     }
     
