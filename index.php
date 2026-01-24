@@ -175,7 +175,7 @@ span.short{display:none}
 <h3>Cambiar avatar</h3>
 <div class="avatar-grid">
 <?php for($i=1;$i<=20;$i++): ?>
-<img src="avatars/avatar_<?=$i?>.jpg"
+<img src="avatars/avatar<?=$i?>.jpg"
  class="avatar-option"
  onclick="updateAvatar('avatar<?=$i?>')">
 <?php endfor ?>
