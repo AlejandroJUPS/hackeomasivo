@@ -192,7 +192,7 @@ span.short{display:none}
  [$s,$r]=explode("::",$f); ?>
 <a class="game" href="play.php?system=<?=$s?>&rom=<?=urlencode($r)?>">
 <span class="star active" onclick="toggleFav(event,'<?=$s?>','<?=$r?>')">★</span>
-<img src="logos/<?=$s?>.png">
+<img src="<?=$systems[$s]['logo']?>">
 <div><?=cleanName($r)?></div>
 </a>
 <?php endforeach ?>
