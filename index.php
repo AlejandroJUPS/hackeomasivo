@@ -170,7 +170,12 @@ span.short{display:none}
 <?php if($showAccount && $logged): ?>
 <h2>Cuenta</h2>
 
-<img src="<?= $avatarPath ?>" class="avatar-large">
+<div style="display:flex;align-items:center;gap:20px;margin-bottom:30px">
+ <img src="<?= $avatarPath ?>" class="avatar-large" style="margin-bottom:0">
+ <div>
+  <h3 style="margin:0"><?=$username?></h3>
+ </div>
+</div>
 
 <h3>Cambiar avatar</h3>
 <div class="avatar-grid">
