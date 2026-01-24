@@ -223,6 +223,23 @@ foreach($avatars as $avatarName): ?>
 
 <button class="logout-btn" onclick="logout()">Cerrar sesión</button>
 
+<?php elseif($showAccount && !$logged): ?>
+<h2>Cuenta</h2>
+<p style="margin-bottom:30px;">Inicia sesión o crea una cuenta para guardar tus favoritos.</p>
+
+<div style="max-width:400px">
+<h3>Iniciar sesión</h3>
+<input id="loginUser" placeholder="Usuario" style="width:100%;padding:10px;margin:10px 0;border-radius:4px;border:1px solid #555;background:#1a1a1a;color:#fff">
+<input id="loginPass" placeholder="Contraseña" type="password" style="width:100%;padding:10px;margin:10px 0;border-radius:4px;border:1px solid #555;background:#1a1a1a;color:#fff">
+<button onclick="login()" style="width:100%;padding:10px;margin:10px 0;background:#2196F3;color:#fff;border:none;border-radius:4px;cursor:pointer;transition:.2s">Inicia sesión</button>
+<p style="text-align:center;margin:20px 0">o</p>
+
+<h3>Crear cuenta</h3>
+<input id="regUser" placeholder="Usuario" style="width:100%;padding:10px;margin:10px 0;border-radius:4px;border:1px solid #555;background:#1a1a1a;color:#fff">
+<input id="regPass" placeholder="Contraseña (mín. 8 caracteres)" type="password" style="width:100%;padding:10px;margin:10px 0;border-radius:4px;border:1px solid #555;background:#1a1a1a;color:#fff">
+<button onclick="register()" style="width:100%;padding:10px;margin:10px 0;background:#4CAF50;color:#fff;border:none;border-radius:4px;cursor:pointer;transition:.2s">Crear cuenta</button>
+</div>
+
 <?php elseif($showFavorites): ?>
 <h2>⭐ Favoritos</h2>
 <div class="grid">
@@ -307,6 +324,60 @@ function logout(){
   headers:{'Content-Type':'application/x-www-form-urlencoded'},
   body:`action=logout`
  }).then(()=>location.href='index.php');
+}
+
+function login(){
+ const user = document.getElementById('loginUser').value.trim();
+ const pass = document.getElementById('loginPass').value;
+ 
+ if(!user || !pass){
+  alert('Completa todos los campos');
+  return;
+ }
+ 
+ fetch("auth.php",{
+  method:"POST",
+  headers:{'Content-Type':'application/x-www-form-urlencoded'},
+  body:`action=login&username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`
+ }).then(r=>r.text()).then(res=>{
+  if(res==='OK'){
+   location.href='?account=1';
+  }else{
+   alert('Usuario o contraseña incorrectos');
+  }
+ });
+}
+
+function register(){
+ const user = document.getElementById('regUser').value.trim();
+ const pass = document.getElementById('regPass').value;
+ 
+ if(!user || !pass){
+  alert('Completa todos los campos');
+  return;
+ }
+ 
+ if(pass.length < 8){
+  alert('La contraseña debe tener mínimo 8 caracteres');
+  return;
+ }
+ 
+ fetch("auth.php",{
+  method:"POST",
+  headers:{'Content-Type':'application/x-www-form-urlencoded'},
+  body:`action=register&username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`
+ }).then(r=>r.text()).then(res=>{
+  if(res==='OK'){
+   alert('Cuenta creada. Iniciando sesión...');
+   login();
+  }else if(res==='EXISTS'){
+   alert('El usuario ya existe');
+  }else if(res==='SHORT'){
+   alert('La contraseña es muy corta');
+  }else{
+   alert('Error al crear la cuenta');
+  }
+ });
 }
 </script>
 
