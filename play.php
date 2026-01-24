@@ -34,6 +34,7 @@ html, body {
     display: flex;
     width: 100%;
     height: 100%;
+    position: relative;
 }
 #display {
     flex: 1;
@@ -54,6 +55,39 @@ html, body {
     padding: 20px;
     border-left: 2px solid #333;
     overflow-y: auto;
+    transition: all 0.3s ease;
+    position: relative;
+}
+.caratula-sidebar.collapsed {
+    width: 0;
+    padding: 0;
+    border-left: none;
+    overflow: hidden;
+}
+.toggle-caratula {
+    position: absolute;
+    left: -40px;
+    top: 20px;
+    width: 35px;
+    height: 35px;
+    background: #e53935;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 4px 0 0 4px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .2s;
+    z-index: 10;
+}
+.toggle-caratula:hover {
+    background: #c62828;
+}
+.caratula-sidebar.collapsed .toggle-caratula {
+    left: 0;
+    border-radius: 0 4px 4px 0;
 }
 .caratula-image {
     width: 180px;
@@ -63,6 +97,7 @@ html, body {
     box-shadow: 0 4px 8px rgba(0,0,0,0.5);
     margin-bottom: 20px;
 }
+</style>
 .game-title {
     color: #fff;
     font-size: 13px;
@@ -94,7 +129,8 @@ html, body {
         <div id="game"></div>
     </div>
     
-    <div class="caratula-sidebar">
+    <div class="caratula-sidebar" id="caratulaSidebar">
+        <button class="toggle-caratula" onclick="toggleCaratula()" title="Contraer caratula">❮</button>
         <img src="<?= htmlspecialchars($caratulaPath) ?>" alt="Caratula" class="caratula-image">
         <div class="game-title"><?= htmlspecialchars(pathinfo($rom, PATHINFO_FILENAME)) ?></div>
         <button class="back-button" onclick="window.history.back()">← Volver</button>
@@ -102,6 +138,12 @@ html, body {
 </div>
 
 <script>
+/* TOGGLE CARATULA */
+function toggleCaratula() {
+    const sidebar = document.getElementById('caratulaSidebar');
+    sidebar.classList.toggle('collapsed');
+}
+
 /* CONFIGURACIÓN EXACTA COMO EL PROYECTO QUE FUNCIONA */
 
 window.EJS_player = "#game";
