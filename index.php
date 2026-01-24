@@ -174,11 +174,23 @@ span.short{display:none}
 
 <h3>Cambiar avatar</h3>
 <div class="avatar-grid">
-<?php for($i=1;$i<=12;$i++): ?>
-<img src="assets/avatars/avatar<?=$i?>.jpg"
+<?php 
+$avatarDir = __DIR__."/assets/avatars";
+if(is_dir($avatarDir)){
+    $avatarFiles = array_filter(scandir($avatarDir), function($f) {
+        return preg_match('/\.jpg$/i', $f);
+    });
+    sort($avatarFiles);
+    foreach($avatarFiles as $avatarFile):
+        $avatarName = pathinfo($avatarFile, PATHINFO_FILENAME);
+?>
+<img src="assets/avatars/<?=$avatarFile?>"
  class="avatar-option"
- onclick="updateAvatar('avatar<?=$i?>')">
-<?php endfor ?>
+ onclick="updateAvatar('<?=$avatarName?>')">
+<?php 
+    endforeach;
+}
+?>
 </div>
 
 <h3>Cambiar nombre</h3>
