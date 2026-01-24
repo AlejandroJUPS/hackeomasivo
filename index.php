@@ -155,7 +155,7 @@ span.short{display:none}
 
 <h3>Elige un avatar</h3>
 <div class="avatar-grid">
-<?php for($i=1;$i<=10;$i++): ?>
+<?php for($i=1;$i<=12;$i++): ?>
 <div class="avatar-option" onclick="selectAvatar('avatar<?=$i?>.jpg',this)">
 <img src="assets/avatars/avatar<?=$i?>.jpg">
 </div>
