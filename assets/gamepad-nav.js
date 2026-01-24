@@ -47,16 +47,9 @@ class GamepadNavigation {
             
             // Detectar sticks analógicos
             handler.on('axischanged', (e) => {
-                // Left stick
-                if (e.axis === 'LEFT_STICK_X:+1' || e.label === 'LEFT_STICK_X:+1') {
-                    this.debouncedNavigate('right');
-                } else if (e.axis === 'LEFT_STICK_X:-1' || e.label === 'LEFT_STICK_X:-1') {
-                    this.debouncedNavigate('left');
-                } else if (e.axis === 'LEFT_STICK_Y:-1' || e.label === 'LEFT_STICK_Y:-1') {
-                    this.debouncedNavigate('up');
-                } else if (e.axis === 'LEFT_STICK_Y:+1' || e.label === 'LEFT_STICK_Y:+1') {
-                    this.debouncedNavigate('down');
-                }
+                // Ignoramos los sticks analógicos para evitar conflictos
+                // Solo usamos la cruceta digital (D-Pad)
+                console.log('Eje detectado:', e.axis, '(ignorado)');
             });
             
             handler.on('connected', (e) => {
