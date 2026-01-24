@@ -132,6 +132,23 @@ span.short{display:none}
 .avatar-option:hover{
  border-color:#ffd700;
 }
+
+/* LOGOUT BUTTON */
+.logout-btn{
+ background:#e53935;
+ color:#fff;
+ border:none;
+ padding:10px 16px;
+ border-radius:4px;
+ cursor:pointer;
+ margin-top:20px;
+ width:100%;
+ font-size:14px;
+ transition:.2s;
+}
+.logout-btn:hover{
+ background:#c62828;
+}
 </style>
 </head>
 
@@ -144,7 +161,7 @@ span.short{display:none}
 <a href="?account=1">
  <div class="account-box">
    <img src="<?= $avatarPath ?>" class="avatar">
-   <span class="account-text">Cuenta</span>
+   <span class="account-text text">Cuenta</span>
  </div>
 </a>
 
@@ -191,6 +208,8 @@ foreach($avatars as $avatarName): ?>
 <h3>Cambiar nombre</h3>
 <input id="newUser" placeholder="Nuevo nombre">
 <button onclick="updateUsername()">Guardar</button>
+
+<button class="logout-btn" onclick="logout()">Cerrar sesión</button>
 
 <?php elseif($showFavorites): ?>
 <h2>⭐ Favoritos</h2>
@@ -264,6 +283,14 @@ function updateUsername(){
   headers:{'Content-Type':'application/x-www-form-urlencoded'},
   body:`action=update_username&username=${newUser.value}`
  }).then(()=>location.reload());
+}
+
+function logout(){
+ fetch("auth.php",{
+  method:"POST",
+  headers:{'Content-Type':'application/x-www-form-urlencoded'},
+  body:`action=logout`
+ }).then(()=>location.href='index.php');
 }
 </script>
 
