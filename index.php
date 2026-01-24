@@ -150,6 +150,17 @@ span.short{display:none}
 .logout-btn:hover{
  background:#c62828;
 }
+
+/* GAMEPAD NAVIGATION */
+.gamepad-focused {
+ outline: 3px solid #ffd700 !important;
+ outline-offset: 2px;
+ transform: scale(1.05);
+ transition: all 0.1s ease;
+}
+.gamepad-focused.game {
+ outline-color: #ff9800;
+}
 </style>
 </head>
 
@@ -298,6 +309,11 @@ function logout(){
  }).then(()=>location.href='index.php');
 }
 </script>
+
+<!-- GAMEPAD HANDLER -->
+<script src="data/src/gamepad.js"></script>
+<!-- GAMEPAD NAVIGATION -->
+<script src="assets/gamepad-nav.js"></script>
 
 </body>
 </html>
