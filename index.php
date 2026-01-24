@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once "db.php";
+require_once "caratulas.php";
 
 /* =========================
    DATOS DE SESIÓN
@@ -215,10 +216,12 @@ foreach($avatars as $avatarName): ?>
 <h2>⭐ Favoritos</h2>
 <div class="grid">
 <?php foreach($userFavorites as $f):
- [$s,$r]=explode("::",$f); ?>
+ [$s,$r]=explode("::",$f);
+ $caratula = getCaratulaPath($s, $r);
+?>
 <a class="game" href="play.php?system=<?=$s?>&rom=<?=urlencode($r)?>">
 <span class="star active" onclick="toggleFav(event,'<?=$s?>','<?=$r?>')">★</span>
-<img src="<?=$systems[$s]['logo']?>">
+<img src="<?=$caratula?>">
 <div><?=cleanName($r)?></div>
 </a>
 <?php endforeach ?>
@@ -228,11 +231,13 @@ foreach($avatars as $avatarName): ?>
 <h2><?=$systems[$currentSystem]['label']?></h2>
 <div class="grid">
 <?php foreach($roms as $r):
-$id=$currentSystem."::".$r; ?>
+$id=$currentSystem."::".$r;
+$caratula = getCaratulaPath($currentSystem, $r);
+?>
 <a class="game" href="play.php?system=<?=$currentSystem?>&rom=<?=urlencode($r)?>">
 <span class="star <?=in_array($id,$userFavorites)?'active':''?>"
 onclick="toggleFav(event,'<?=$currentSystem?>','<?=$r?>')">★</span>
-<img src="<?=$systems[$currentSystem]['logo']?>">
+<img src="<?=$caratula?>">
 <div><?=cleanName($r)?></div>
 </a>
 <?php endforeach ?>
