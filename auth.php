@@ -3,35 +3,44 @@ session_start();
 require_once "db.php";
 
 /* =========================
+   ACCIONES
+========================= */
+if (!isset($_POST['action'])) {
+    exit;
+}
+
+/* =========================
    LOGIN
 ========================= */
-if(isset($_POST['action']) && $_POST['action']==='login'){
+if ($_POST['action'] === 'login') {
 
     $u = trim($_POST['username'] ?? '');
     $p = $_POST['password'] ?? '';
 
-    if($u==='' || $p===''){
+    if ($u === '' || $p === '') {
         echo "ERROR";
         exit;
     }
 
     $st = $conn->prepare(
-        "SELECT id, password, avatar, color 
+        "SELECT id, username, password, avatar, color 
          FROM users 
-         WHERE username=?"
+         WHERE username = ?"
     );
     $st->bind_param("s", $u);
     $st->execute();
     $res = $st->get_result();
     $row = $res->fetch_assoc();
 
-    if($row && password_verify($p, $row['password'])){
+    if ($row && password_verify($p, $row['password'])) {
+
         $_SESSION['user_id']  = $row['id'];
-        $_SESSION['username'] = $u;
-        $_SESSION['avatar']   = $row['avatar'];
-        $_SESSION['color']    = $row['color'];
+        $_SESSION['username'] = $row['username'];
+        $_SESSION['avatar']   = $row['avatar']; // puede ser NULL
+        $_SESSION['color']    = $row['color'];  // puede ser NULL
+
         echo "OK";
-    }else{
+    } else {
         echo "ERROR";
     }
     exit;
@@ -40,29 +49,30 @@ if(isset($_POST['action']) && $_POST['action']==='login'){
 /* =========================
    REGISTER
 ========================= */
-if(isset($_POST['action']) && $_POST['action']==='register'){
+if ($_POST['action'] === 'register') {
 
     $u = trim($_POST['username'] ?? '');
     $p = $_POST['password'] ?? '';
-    $avatar = $_POST['avatar'] ?? null;
-    $color  = $_POST['color']  ?? null;
 
-    if(strlen($u)<3 || strlen($p)<8){
-        echo "INVALID";
+    $avatar = $_POST['avatar'] ?? null; // ej: avatar_3
+    $color  = $_POST['color']  ?? null; // ej: #ff0044
+
+    if ($u === '' || strlen($p) < 8) {
+        echo "SHORT";
         exit;
     }
 
     $hash = password_hash($p, PASSWORD_DEFAULT);
 
     $st = $conn->prepare(
-        "INSERT INTO users(username,password,avatar,color)
-         VALUES(?,?,?,?)"
+        "INSERT INTO users (username, password, avatar, color)
+         VALUES (?, ?, ?, ?)"
     );
     $st->bind_param("ssss", $u, $hash, $avatar, $color);
 
-    if($st->execute()){
+    if ($st->execute()) {
         echo "OK";
-    }else{
+    } else {
         echo "EXISTS";
     }
     exit;
@@ -71,111 +81,44 @@ if(isset($_POST['action']) && $_POST['action']==='register'){
 /* =========================
    LOGOUT
 ========================= */
-if(isset($_POST['action']) && $_POST['action']==='logout'){
+if ($_POST['action'] === 'logout') {
+
+    session_unset();
     session_destroy();
+
     echo "OK";
     exit;
 }
 
 /* =========================
-   TOGGLE FAVORITO
+   UPDATE AVATAR / COLOR
 ========================= */
-if(isset($_POST['action']) && $_POST['action']==='toggle_favorite'){
+if ($_POST['action'] === 'update_profile') {
 
-    if(!isset($_SESSION['user_id'])){
+    if (!isset($_SESSION['user_id'])) {
         echo "NO_LOGIN";
         exit;
     }
 
-    $uid = $_SESSION['user_id'];
-    $system = $_POST['system'] ?? '';
-    $rom    = $_POST['rom'] ?? '';
-
-    if($system==='' || $rom===''){
-        echo "ERROR";
-        exit;
-    }
+    $uid    = $_SESSION['user_id'];
+    $avatar = $_POST['avatar'] ?? null;
+    $color  = $_POST['color']  ?? null;
 
     $st = $conn->prepare(
-        "SELECT id FROM favorites 
-         WHERE user_id=? AND system=? AND rom=?"
-    );
-    $st->bind_param("iss", $uid, $system, $rom);
-    $st->execute();
-    $st->store_result();
-
-    if($st->num_rows){
-        $del = $conn->prepare(
-            "DELETE FROM favorites 
-             WHERE user_id=? AND system=? AND rom=?"
-        );
-        $del->bind_param("iss", $uid, $system, $rom);
-        $del->execute();
-        echo "REMOVED";
-    }else{
-        $ins = $conn->prepare(
-            "INSERT INTO favorites(user_id,system,rom)
-             VALUES(?,?,?)"
-        );
-        $ins->bind_param("iss", $uid, $system, $rom);
-        $ins->execute();
-        echo "ADDED";
-    }
-    exit;
-}
-
-/* =========================
-   CAMBIAR AVATAR / COLOR
-========================= */
-if(isset($_POST['action']) && $_POST['action']==='change_avatar'){
-
-    if(!isset($_SESSION['user_id'])){
-        echo "NO_LOGIN";
-        exit;
-    }
-
-    $uid = $_SESSION['user_id'];
-    $avatar = $_POST['avatar'] !== "" ? $_POST['avatar'] : null;
-    $color  = $_POST['color']  !== "" ? $_POST['color']  : null;
-
-    $st = $conn->prepare(
-        "UPDATE users 
-         SET avatar=?, color=? 
-         WHERE id=?"
+        "UPDATE users SET avatar = ?, color = ? WHERE id = ?"
     );
     $st->bind_param("ssi", $avatar, $color, $uid);
-    $st->execute();
 
-    $_SESSION['avatar'] = $avatar;
-    $_SESSION['color']  = $color;
+    if ($st->execute()) {
 
-    echo "OK";
+        $_SESSION['avatar'] = $avatar;
+        $_SESSION['color']  = $color;
+
+        echo "OK";
+    } else {
+        echo "ERROR";
+    }
     exit;
 }
 
-/* =========================
-   FETCH FAVORITOS (opcional)
-========================= */
-if(isset($_POST['action']) && $_POST['action']==='get_favorites'){
-
-    if(!isset($_SESSION['user_id'])){
-        echo json_encode([]);
-        exit;
-    }
-
-    $uid = $_SESSION['user_id'];
-    $out = [];
-
-    $res = $conn->query(
-        "SELECT system, rom 
-         FROM favorites 
-         WHERE user_id=$uid"
-    );
-
-    while($r = $res->fetch_assoc()){
-        $out[] = $r['system']."::".$r['rom'];
-    }
-
-    echo json_encode($out);
-    exit;
-}
+echo "INVALID";
