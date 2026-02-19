@@ -1,4 +1,3 @@
-// file: index.php (versión mejorada con estilo retro)
 <?php
 session_start();
 require_once "db.php";
